@@ -1,0 +1,3 @@
+%packager Sergey_Novikov
+%_topdir /root/rpmbuild
+%_tmppath /root/rpmbuild/tmp
