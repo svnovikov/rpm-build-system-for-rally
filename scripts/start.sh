@@ -9,7 +9,7 @@ if [ ! -z ${SCENARIO} ]; then
     rally --debug --plugin-path /usr/local/lib/python2.7/site-packages/haos/rally/context,/usr/local/lib/python2.7/site-packages/haos/rally/plugin task start /usr/local/lib/python2.7/site-packages/haos/scenarios/${SCENARIO}
     
     r_code=$?
-    $id=$(rally task list | awk '{print \$2}' | tail -2)
+    $id=$(rally task list | awk '{print $2}' | tail -2)
 
     if [ $r_code='0' ]; then
         rally task report $id --out output.html

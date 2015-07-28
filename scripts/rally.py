@@ -20,7 +20,7 @@ def _is_rally_container_exist():
 def _collect_env_vars(scenario):
 
     # get latest env id
-    command = "fuel env | awk '{print \$1}' | tail -1"
+    command = "fuel env | awk '{print $1}' | tail -1"
     env_id = os.popen(command).read().replace('\n','')
     try:
         int(env_id)
