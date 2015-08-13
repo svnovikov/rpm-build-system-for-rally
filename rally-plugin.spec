@@ -5,7 +5,7 @@ Release: 0
 License:   Apache 2.0
 BuildArch: noarch
 BuildRoot: /root/rpmbuild/BUILDROOT
-Source0:   rally.tar.lrz
+Source0:   rallyd.tar.lrz
 URL:       http://mirantis.com
 Requires:  docker-io
 Requires:  lrzip
@@ -20,22 +20,20 @@ cp %{SOURCE0} %{name}-%{version}
 %install
 cd %{name}-%{version}
 mkdir -p $RPM_BUILD_ROOT/tmp
-cp rally.tar.lrz $RPM_BUILD_ROOT/tmp/
+cp rallyd.tar.lrz $RPM_BUILD_ROOT/tmp/
 cd $RPM_BUILD_ROOT/tmp/
-lrztar -d rally.tar.lrz
+lrztar -d rallyd.tar.lrz
 cd
 
 %post
-docker load < /tmp/rally/fuel-rally.tar
-cp /tmp/rally/rally.py /usr/local/bin/rally
-chmod +x /usr/local/bin/rally
+docker load < /tmp/rallyd/rallyd.tar
 
 %clean
 rm -rf %{name}-buildroot
 
 %files
-/tmp/rally.tar.lrz
-/tmp/rally/fuel-rally.tar
-/tmp/rally/rally.py
-/tmp/rally/rally.pyc
-/tmp/rally/rally.pyo
+/tmp/rallyd.tar.lrz
+/tmp/rallyd/rallyd.tar
+/tmp/rallyd/rallyd-client.py
+/tmp/rallyd/rallyd-client.pyc
+/tmp/rallyd/rallyd-client.pyo
