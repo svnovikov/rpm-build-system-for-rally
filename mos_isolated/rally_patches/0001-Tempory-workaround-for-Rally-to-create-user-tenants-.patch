@@ -1,0 +1,32 @@
+From c1c8dfc40e4636c905d577e3927fb400cd012afb Mon Sep 17 00:00:00 2001
+From: Dmitry Kalashnik <dkalashnik@mirantis.com>
+Date: Fri, 11 Sep 2015 15:23:05 +0300
+Subject: [PATCH] Tempory workaround for Rally to create user/tenants with
+ random suffix
+
+Related bugs:
+    https://bugs.launchpad.net/keystone/+bug/1494398
+    https://bugs.launchpad.net/mos/+bug/1493879
+
+Change-Id: Ic403c759aa44fb5a786e06bfb0350d0c223f6319
+---
+ rally/plugins/openstack/context/keystone/users.py | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/rally/plugins/openstack/context/keystone/users.py b/rally/plugins/openstack/context/keystone/users.py
+index 873b56c..df94a1a 100644
+--- a/rally/plugins/openstack/context/keystone/users.py
++++ b/rally/plugins/openstack/context/keystone/users.py
+@@ -180,7 +180,8 @@ class UserGenerator(UserContextMixin, context.Context):
+                 clients = osclients.Clients(self.endpoint)
+                 cache["client"] = keystone.wrap(clients.keystone())
+             tenant = cache["client"].create_project(
+-                self.PATTERN_TENANT % {"task_id": task_id, "iter": i}, domain)
++                self.PATTERN_TENANT % {"task_id": task_id, "iter": i}
++                + str(random.random())[1:7], domain)
+             tenant_dict = {"id": tenant.id, "name": tenant.name}
+             tenants.append(tenant_dict)
+ 
+-- 
+2.3.2 (Apple Git-55)
+
