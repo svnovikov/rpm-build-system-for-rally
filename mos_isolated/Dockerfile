@@ -24,7 +24,7 @@ RUN git config --global user.name "Rally User"                              && \
     pip install -r /opt/tempest/requirements.txt                               \
                 -r /opt/tempest/test-requirements.txt
 
-# Apply available pathes for rally and tempest
+# Apply available patches for rally and tempest
 RUN cd /opt/tempest                                                         && \
     git am /tmp/mos_isolated/tempest_patches/*                              && \
     cd /usr/local/lib/python2.7/dist-packages                               && \
