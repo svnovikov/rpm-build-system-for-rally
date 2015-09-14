@@ -6,7 +6,6 @@ WORK_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 BUILD_CONTAINER="centos/rpm_builder"
 TARGET_CONTAINER="rallyd-isolated"
 
-
 # Build docker image with rally, rallyd and haproxy
 docker build -t ${TARGET_CONTAINER} ${WORK_DIR}/mos_isolated
 docker save -o ${WORK_DIR}/rallyd.tar ${TARGET_CONTAINER}

@@ -13,7 +13,8 @@ RUN apt-get update                                                          && \
                        libxml2-dev libxslt1-dev python-dev python
 
 # Install mos-nodes plugin
-RUN git clone https://github.com/dkalashnik/
+RUN git clone https://github.com/dkalashnik/rally-mos-nodes-plugin          && \
+    pip install ./rally-mos-nodes-plugin
 
 # Install local copy of tempest tag 6
 RUN git config --global user.name "Rally User"                              && \
@@ -25,7 +26,7 @@ RUN git config --global user.name "Rally User"                              && \
 
 # Apply available pathes for rally and tempest
 RUN cd /opt/tempest                                                         && \
-    && git am /tmp/mos_isolated/tempest_patches/*                           && \
+    git am /tmp/mos_isolated/tempest_patches/*                              && \
     cd /usr/local/lib/python2.7/dist-packages                               && \
     git apply /tmp/mos_isolated/rally_patches/*
 
