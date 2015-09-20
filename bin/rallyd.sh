@@ -12,6 +12,17 @@ get_backends() {
     echo ${backends}
 }
 
+enable_admin_api() {
+    apache_proxy_conf="/etc/apache2/sites-enabled/25-apache_api_proxy.conf"
+    enable_command="sed -i '/AllowCONNECT/ s/$/ 35357/' ${apache_proxy_conf}; service apache2 restart"
+    enable_with_check="if \$(grep AllowCONNECT ${apache_proxy_conf} | grep -qv 35357); then ${enable_command}; fi"
+
+    for addr in $(fuel nodes | grep "controller" | grep -Eo "([0-9]{1,3}[\.]){3}[0-9]{1,3}" 2>/dev/null)
+    do
+        ssh $addr "${enable_with_check}"
+    done
+}
+
 get_pid() {
     cat "$pid_file"
 }
@@ -26,6 +37,7 @@ case "$1" in
         echo "Already started"
     else
         echo "Starting $name"
+        enable_admin_api
         pid=$(docker run -d -e BACKEND_IPS="$(get_backends)" -p 0.0.0.0:10000:8000 rallyd-isolated)
         echo ${pid:0:12} > "$pid_file"
         docker exec `get_pid` /bin/bash -c "mkdir /root/.ssh"

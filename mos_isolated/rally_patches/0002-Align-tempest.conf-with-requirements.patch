@@ -1,0 +1,163 @@
+From 1a054b385d91f353ed564c06c4d68c87422e5e27 Mon Sep 17 00:00:00 2001
+From: Dmitry Kalashnik <dkalashnik@mirantis.com>
+Date: Sat, 19 Sep 2015 19:59:42 +0300
+Subject: [PATCH] Align tempest.conf with requirements
+
+Change-Id: Id4ac599c548762fecf190a52a7d059dd5efe7466
+---
+ rally/verification/tempest/config.ini | 51 +++++++++++++++++++++++++----------
+ rally/verification/tempest/config.py  | 26 +++++++++++++-----
+ 2 files changed, 57 insertions(+), 20 deletions(-)
+
+diff --git a/rally/verification/tempest/config.ini b/rally/verification/tempest/config.ini
+index f6eaf31..b81f141 100644
+--- a/rally/verification/tempest/config.ini
++++ b/rally/verification/tempest/config.ini
+@@ -4,36 +4,57 @@ log_file = tempest.log
+ use_stderr = False
+ 
+ [auth]
+-allow_tenant_isolation = False
++allow_tenant_isolation=True
++create_isolated_networks=True
+ 
+-[boto]
+-instance_type = m1.nano
+-http_socket_timeout = 30
+-build_interval = 1
+-build_timeout = 196
++[identity]
++disable_ssl_certificate_validation=True
++
++[identity-feature-enabled]
++api_v3=False
+ 
+ [compute]
+ ssh_connect_method = floating
+ image_ssh_user = cirros
+ image_alt_ssh_user = cirros
++image_ssh_password = cubswin:)
+ network_for_ssh = private
+ ssh_user = cirros
++fixed_network_name = net04
+ build_interval = 1
+-build_timeout = 196
++build_timeout = 300
+ 
+ [compute-feature-enabled]
++api_extensions = OS-FLV-EXT-DATA,os-server-groups
+ change_password = False
+ live_migration = False
+ block_migration_for_live_migration = False
+-
+-[identity]
++ec2_api = False
+ 
+ [network]
+ tenant_networks_reachable = False
+ 
+ [network-feature-enabled]
+ api_extensions = all
+-ipv6 = True
++ipv6 = False
++
++[volume]
++build_interval = 1
++build_timeout = 300
++
++[volume-feature-enabled]
++backup=False
++
++[object-storage]
++operator_role=SwiftOperator
++
++[object-storage-feature-enabled]
++container_sync=False
++
++[orchestration]
++stack_owner_role=heat_stack_owner
++max_template_size=5440001
++max_resources_per_stack=20001
+ 
+ [oslo_concurrency]
+ 
+@@ -41,12 +62,14 @@ ipv6 = True
+ large_ops_number = 0
+ ssh_user = cirros
+ 
+-[service_available]
+-
+ [validation]
+ ssh_timeout = 196
+ ip_version_for_ssh = 4
+ 
+-[volume]
++[boto]
++instance_type = m1.nano
++http_socket_timeout = 30
+ build_interval = 1
+-build_timeout = 196
++build_timeout = 300
++
++[service_available]
+diff --git a/rally/verification/tempest/config.py b/rally/verification/tempest/config.py
+index d1f9caa..78dac53 100644
+--- a/rally/verification/tempest/config.py
++++ b/rally/verification/tempest/config.py
+@@ -144,7 +144,8 @@ class TempestConf(object):
+             try:
+                 image = glanceclient.images.create(name=("cirros_%s" % now),
+                                                    disk_format="qcow2",
+-                                                   container_format="bare")
++                                                   container_format="bare",
++                                                   is_public=True)
+                 image.update(data=open(self.img_path, "rb"))
+                 image_list.append(image)
+             except Exception as e:
+@@ -210,10 +211,11 @@ class TempestConf(object):
+             if public_net:
+                 net_id = public_net[0]["id"]
+                 self.conf.set(section_name, "public_network_id", net_id)
+-                public_router = neutron.list_routers(
+-                    network_id=net_id)["routers"][0]
+-                self.conf.set(section_name, "public_router_id",
+-                              public_router["id"])
++                # NOTE(dkalashnik): No need to set it for isolated networks
++                # public_router = neutron.list_routers(
++                #     network_id=net_id)["routers"][0]
++                # self.conf.set(section_name, "public_router_id",
++                #               public_router["id"])
+                 subnets = neutron.list_subnets(network_id=net_id)["subnets"]
+                 if subnets:
+                     subnet = subnets[0]
+@@ -227,7 +229,8 @@ class TempestConf(object):
+                 else:
+                     # TODO(akurilin): create subnet
+                     LOG.warn("No subnet is found.")
+-            self.conf.set(section_name, "tenant_network_cidr", subnet["cidr"])
++            # NOTE(dkalashnik): No need to set it for isolated networks
++            # self.conf.set(section_name, "tenant_network_cidr", subnet["cidr"])
+         else:
+             network = self.clients.nova().networks.list()[0]
+             self.conf.set(section_name, "tenant_network_cidr", network.cidr)
+@@ -251,6 +254,17 @@ class TempestConf(object):
+         # on attempt to get option with boolean value
+         self.conf.set(section_name, "horizon", str(horizon_availability))
+ 
++    def _set_stack_owner_role(self):
++        stack_owner_role = "heat_stack_owner"
++        self.keystoneclient = self.clients.keystone()
++        if not any([stack_owner_role == role.name
++                    for role in self.keystoneclient.roles.list()]):
++            self.keystoneclient.roles.create(stack_owner_role)
++
++    def _set_scenario_dirs(self):
++        self.conf.set("scenario", "img_dir", self.data_path)
++        self.conf.set("scenario", "img_file", CONF.image.cirros_image)
++
+     def write_config(self, file_name):
+         with open(file_name, "w+") as f:
+             self.conf.write(f)
+-- 
+2.3.8 (Apple Git-58)
+

@@ -1,0 +1,31 @@
+{
+    "ControllerDisaster.reboot_controller_with_primitive": [
+        {
+            "args": {
+                "resource": "vip__management",
+                "force_reboot": true,
+                "flavor": {
+                    "name": "m1.tiny"
+                },
+                "image": {
+                    "name": "TestVM"
+                },
+                "force_delete": false
+            },
+            "runner": {
+                "type": "serial",
+                "times": 1
+            },
+            "context": {
+                "users": {
+                    "tenants": 1,
+                    "users_per_tenant": 1
+                },
+                "ssh_cloud": {
+                    "transport_driver": "haos.rally.transport.ssh_transport.SSHTransport",
+                    "nodes": {{nodes}}
+                }
+            }
+        }
+    ]
+}
