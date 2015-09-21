@@ -1,19 +1,19 @@
-From 1a054b385d91f353ed564c06c4d68c87422e5e27 Mon Sep 17 00:00:00 2001
+From e9869365e434671641e0e18a9ea5aa36caceb9b8 Mon Sep 17 00:00:00 2001
 From: Dmitry Kalashnik <dkalashnik@mirantis.com>
 Date: Sat, 19 Sep 2015 19:59:42 +0300
 Subject: [PATCH] Align tempest.conf with requirements
 
 Change-Id: Id4ac599c548762fecf190a52a7d059dd5efe7466
 ---
- rally/verification/tempest/config.ini | 51 +++++++++++++++++++++++++----------
- rally/verification/tempest/config.py  | 26 +++++++++++++-----
- 2 files changed, 57 insertions(+), 20 deletions(-)
+ rally/verification/tempest/config.ini | 52 +++++++++++++++++++++++++----------
+ rally/verification/tempest/config.py  | 33 ++++++++++++++++++----
+ 2 files changed, 65 insertions(+), 20 deletions(-)
 
 diff --git a/rally/verification/tempest/config.ini b/rally/verification/tempest/config.ini
-index f6eaf31..b81f141 100644
+index f6eaf31..95e7771 100644
 --- a/rally/verification/tempest/config.ini
 +++ b/rally/verification/tempest/config.ini
-@@ -4,36 +4,57 @@ log_file = tempest.log
+@@ -4,36 +4,58 @@ log_file = tempest.log
  use_stderr = False
  
  [auth]
@@ -63,7 +63,7 @@ index f6eaf31..b81f141 100644
 +
 +[volume]
 +build_interval = 1
-+build_timeout = 300
++build_timeout = 600
 +
 +[volume-feature-enabled]
 +backup=False
@@ -72,6 +72,7 @@ index f6eaf31..b81f141 100644
 +operator_role=SwiftOperator
 +
 +[object-storage-feature-enabled]
++discoverable_apis=bulk,account_quotas,container_quotas,staticweb,crossdomain,formpost,slo,tempurl
 +container_sync=False
 +
 +[orchestration]
@@ -81,7 +82,7 @@ index f6eaf31..b81f141 100644
  
  [oslo_concurrency]
  
-@@ -41,12 +62,14 @@ ipv6 = True
+@@ -41,12 +63,14 @@ ipv6 = True
  large_ops_number = 0
  ssh_user = cirros
  
@@ -101,7 +102,7 @@ index f6eaf31..b81f141 100644
 +
 +[service_available]
 diff --git a/rally/verification/tempest/config.py b/rally/verification/tempest/config.py
-index d1f9caa..78dac53 100644
+index d1f9caa..58536f8 100644
 --- a/rally/verification/tempest/config.py
 +++ b/rally/verification/tempest/config.py
 @@ -144,7 +144,8 @@ class TempestConf(object):
@@ -140,16 +141,23 @@ index d1f9caa..78dac53 100644
          else:
              network = self.clients.nova().networks.list()[0]
              self.conf.set(section_name, "tenant_network_cidr", network.cidr)
-@@ -251,6 +254,17 @@ class TempestConf(object):
+@@ -251,6 +254,24 @@ class TempestConf(object):
          # on attempt to get option with boolean value
          self.conf.set(section_name, "horizon", str(horizon_availability))
  
 +    def _set_stack_owner_role(self):
 +        stack_owner_role = "heat_stack_owner"
-+        self.keystoneclient = self.clients.keystone()
++        keystoneclient = self.clients.keystone()
 +        if not any([stack_owner_role == role.name
-+                    for role in self.keystoneclient.roles.list()]):
-+            self.keystoneclient.roles.create(stack_owner_role)
++                    for role in keystoneclient.roles.list()]):
++            keystoneclient.roles.create(stack_owner_role)
++
++    def _set_reseller_admin_role_role(self):
++        reseller_admin_role = "ResellerAdmin"
++        keystoneclient = self.clients.keystone()
++        if not any([reseller_admin_role == role.name
++                    for role in keystoneclient.roles.list()]):
++            keystoneclient.roles.create(reseller_admin_role)
 +
 +    def _set_scenario_dirs(self):
 +        self.conf.set("scenario", "img_dir", self.data_path)

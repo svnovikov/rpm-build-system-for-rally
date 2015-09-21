@@ -1,0 +1,37 @@
+From 255ab65eb49d94943330c42a5b9e2a6507f82917 Mon Sep 17 00:00:00 2001
+From: Dmitry Kalashnik <dkalashnik@mirantis.com>
+Date: Sun, 20 Sep 2015 23:27:04 +0300
+Subject: [PATCH] Add cli command for tempest installation
+
+Change-Id: Ic564b331e8f6fe593d9e579620c89c7787c00627
+---
+ rally/cli/commands/verify.py | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/rally/cli/commands/verify.py b/rally/cli/commands/verify.py
+index 867ba24..5ed9bb9 100644
+--- a/rally/cli/commands/verify.py
++++ b/rally/cli/commands/verify.py
+@@ -81,6 +81,19 @@ class VerifyCommands(object):
+         if do_use:
+             self.use(verification["uuid"])
+ 
++    @cliutils.args("--deployment", dest="deployment", type=str,
++                   required=False, help="UUID or name of a deployment.")
++    @cliutils.args("--source", dest="source", type=str,
++                   required=True, help="URL of tempest repository")
++    @envutils.with_default_deployment(cli_arg_name="deployment")
++    def install(self, deployment, source):
++        """Install tempest for deployment.
++
++        :param deployment: UUID or name of a deployment
++        :param source: URL of tempest repository
++        """
++        api.Verification.install_tempest(deployment, source)
++
+     def list(self):
+         """Display all verifications table, started and finished."""
+ 
+-- 
+2.3.8 (Apple Git-58)
+

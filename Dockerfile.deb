@@ -1,0 +1,19 @@
+FROM ubuntu
+MAINTAINER Dmitry Kalashnik <dkalashnik@mirantis.com>
+
+RUN apt-get update && apt-get install git wget make gcc lrzip autoconf                  \
+    automake libtool autotools-dev dpkg dpkg-dev fakeroot dh-make -y
+
+COPY . /tmp/build
+
+RUN mkdir build && cd build                                                          && \
+    mkdir -p rallyd-docker_1.0.0/usr/bin && mkdir -p rallyd-docker_1.0.0/tmp         && \
+    git clone http://github.com/dkalashnik/rallyd /tmp/build/rallyd                  && \
+    lrzip -D -o rallyd-docker_1.0.0/tmp/rallyd.tar.lrz /tmp/build/rallyd.tar         && \
+    mv /tmp/build/rallyd . && lrztar rallyd/rallyd-client                            && \
+    mv rallyd-client.tar.lrz rallyd-docker_1.0.0/tmp                                 && \
+    chmod +x /tmp/build/deb/bin/rallyd.sh                                            && \
+    cp /tmp/build/deb/bin/rallyd.sh rallyd-docker_1.0.0/usr/bin                      && \
+    cp -r /tmp/build/deb/debian rallyd-docker_1.0.0
+
+RUN cd build/rallyd-docker_1.0.0 && dpkg-buildpackage -rfakeroot

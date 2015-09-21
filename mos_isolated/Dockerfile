@@ -10,7 +10,7 @@ COPY . /tmp/mos_isolated
 # Install deb dependencies
 RUN apt-get update                                                          && \
     apt-get -y install build-essential gcc-4.8 libffi-dev libssl-dev           \
-                       libxml2-dev libxslt1-dev python-dev python vim
+                       libxml2-dev libxslt1-dev python-dev python vim git
 
 # Install mos-nodes plugin
 RUN git clone https://github.com/dkalashnik/rally-mos-nodes-plugin          && \

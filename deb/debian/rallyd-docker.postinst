@@ -1,0 +1,13 @@
+#!/bin/sh -e
+
+if [ "$1" = "configure" ]
+then
+    lrzip -d -o /tmp/rallyd.tar /tmp/rallyd.tar.lrz
+    docker load -i /tmp/rallyd.tar
+    cd /tmp && lrzuntar /tmp/rallyd-client.tar.lrz
+    pip install /tmp/rallyd/rallyd-client/
+    rm /tmp/rallyd.tar
+    rm -r /tmp/rallyd
+fi
+
+#DEBHELPER#

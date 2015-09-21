@@ -1,0 +1,14 @@
+Source: rallyd-docker
+Section: misc
+Priority: extra
+Maintainer: Mirantis
+Build-Depends: lrzip
+Standards-Version: 3.9.4
+
+Package: rallyd-docker
+Architecture: all
+Depends:
+ docker.io,
+ lrzip,
+ python-pip
+Description: Imports docker container with Rally into docker and installs client

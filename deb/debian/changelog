@@ -1,0 +1,5 @@
+rallyd-docker (1.0.0) unstable; urgency=low
+
+  * Initial release.
+
+ -- Dmitry Kalashnik <dkalashnik@mirantis.com>  Mon, 21 Sep 2015 12:00:00 +0400
