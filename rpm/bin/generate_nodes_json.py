@@ -40,7 +40,7 @@ def generate_rally_mos_nodes_tasks():
         "roles": ["master"]
     })
 
-    return nodes
+    return {"nodes": nodes}
 
 
 if __name__ == "__main__":

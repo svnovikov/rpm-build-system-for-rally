@@ -1,26 +1,27 @@
-From 3b24b5f84daa24f94c258a3a8909ae550d9b3eb0 Mon Sep 17 00:00:00 2001
+From 6b91bd5a3042c75aa2d7e44035a3dcc5b7b47c55 Mon Sep 17 00:00:00 2001
 From: Dmitry Kalashnik <dkalashnik@mirantis.com>
 Date: Sun, 20 Sep 2015 23:17:19 +0300
 Subject: [PATCH] Mark volume_type tests as multibackend
 
 ---
- tempest/api/volume/admin/test_volume_types.py | 6 ++++++
- 1 file changed, 6 insertions(+)
+ tempest/api/volume/admin/test_volume_types.py | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
 diff --git a/tempest/api/volume/admin/test_volume_types.py b/tempest/api/volume/admin/test_volume_types.py
-index 2d9019a..d1d50a2 100644
+index 2d9019a..78cedb0 100644
 --- a/tempest/api/volume/admin/test_volume_types.py
 +++ b/tempest/api/volume/admin/test_volume_types.py
-@@ -23,6 +23,12 @@ CONF = config.CONF
+@@ -23,6 +23,13 @@ CONF = config.CONF
  
  class VolumeTypesV2Test(base.BaseVolumeAdminTest):
  
 +    @classmethod
 +    def skip_checks(cls):
 +        super(VolumeTypesV2Test, cls).skip_checks()
-+
++        # NOTE(dkalashnik): Add check of enabled multi-backend feature
 +        if not CONF.volume_feature_enabled.multi_backend:
 +            raise cls.skipException("Cinder multi-backend feature disabled")
++
      def _delete_volume(self, volume_id):
          self.volumes_client.delete_volume(volume_id)
          self.volumes_client.wait_for_resource_deletion(volume_id)

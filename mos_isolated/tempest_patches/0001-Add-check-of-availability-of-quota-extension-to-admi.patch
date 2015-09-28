@@ -1,21 +1,23 @@
-From f6441ccce8826a5d5172e279e9d6dbbcc32101aa Mon Sep 17 00:00:00 2001
+From d1eabb87726467be1ed0175499fc9db9d5347464 Mon Sep 17 00:00:00 2001
 From: Dmitry Kalashnik <dkalashnik@mirantis.com>
 Date: Sun, 20 Sep 2015 20:33:43 +0300
 Subject: [PATCH] Add check of availability of quota extension to admin quota
 
 ---
- tempest/api/compute/admin/test_quotas.py          | 14 ++++++++++++++
- tempest/api/compute/admin/test_quotas_negative.py |  7 +++++++
- 2 files changed, 21 insertions(+)
+ tempest/api/compute/admin/test_quotas.py          | 18 ++++++++++++++++++
+ tempest/api/compute/admin/test_quotas_negative.py |  9 +++++++++
+ 2 files changed, 27 insertions(+)
 
 diff --git a/tempest/api/compute/admin/test_quotas.py b/tempest/api/compute/admin/test_quotas.py
-index ef96f9b..3c5395b 100644
+index ef96f9b..71ce3cc 100644
 --- a/tempest/api/compute/admin/test_quotas.py
 +++ b/tempest/api/compute/admin/test_quotas.py
-@@ -28,6 +28,13 @@ LOG = logging.getLogger(__name__)
+@@ -28,6 +28,15 @@ LOG = logging.getLogger(__name__)
  class QuotasAdminTestJSON(base.BaseV2ComputeAdminTest):
      force_tenant_isolation = True
-
+ 
++    # NOTE(dkalashnik): Add missing check of os-quota-sets extension
++    # enabled in config
 +    @classmethod
 +    def skip_checks(cls):
 +        super(QuotasAdminTestJSON, cls).skip_checks()
@@ -26,10 +28,12 @@ index ef96f9b..3c5395b 100644
      def setUp(self):
          # NOTE(mriedem): Avoid conflicts with os-quota-class-sets tests.
          self.useFixture(fixtures.LockFixture('compute_quotas'))
-@@ -156,6 +163,13 @@ class QuotaClassesAdminTestJSON(base.BaseV2ComputeAdminTest):
+@@ -156,6 +165,15 @@ class QuotaClassesAdminTestJSON(base.BaseV2ComputeAdminTest):
      """Tests the os-quota-class-sets API to update default quotas.
      """
-
+ 
++    # NOTE(dkalashnik): Add missing check of os-quota-sets extension
++    # enabled in config
 +    @classmethod
 +    def skip_checks(cls):
 +        super(QuotaClassesAdminTestJSON, cls).skip_checks()
@@ -41,22 +45,25 @@ index ef96f9b..3c5395b 100644
          # All test cases in this class need to externally lock on doing
          # anything with default quota values.
 diff --git a/tempest/api/compute/admin/test_quotas_negative.py b/tempest/api/compute/admin/test_quotas_negative.py
-index 758cd43..71a4912 100644
+index 758cd43..69f013d 100644
 --- a/tempest/api/compute/admin/test_quotas_negative.py
 +++ b/tempest/api/compute/admin/test_quotas_negative.py
-@@ -27,6 +27,13 @@ class QuotasAdminNegativeTestJSON(base.BaseV2ComputeAdminTest):
+@@ -26,6 +26,15 @@ CONF = config.CONF
+ class QuotasAdminNegativeTestJSON(base.BaseV2ComputeAdminTest):
      force_tenant_isolation = True
-
-     @classmethod
+ 
++    # NOTE(dkalashnik): Add missing check of os-quota-sets extension
++    # enabled in config
++    @classmethod
 +    def skip_checks(cls):
 +        super(QuotasAdminNegativeTestJSON, cls).skip_checks()
 +        if not test.is_extension_enabled('os-quota-sets', 'compute'):
 +            msg = "quotas extension not enabled."
 +            raise cls.skipException(msg)
 +
-+    @classmethod
+     @classmethod
      def setup_clients(cls):
          super(QuotasAdminNegativeTestJSON, cls).setup_clients()
-         cls.client = cls.os.quotas_client
---
+-- 
 2.3.8 (Apple Git-58)
+

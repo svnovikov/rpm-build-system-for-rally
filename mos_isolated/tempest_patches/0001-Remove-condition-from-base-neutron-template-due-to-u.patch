@@ -1,12 +1,13 @@
-From c68a97b70f27555951d5b28cc445fe4a198c2a4e Mon Sep 17 00:00:00 2001
+From f1092d411978add6445a9c0352a1a1dac1dc357f Mon Sep 17 00:00:00 2001
 From: Dmitry Kalashnik <dkalashnik@mirantis.com>
 Date: Mon, 21 Sep 2015 17:49:08 +0300
 Subject: [PATCH] Remove condition from base neutron template due to
  unavailability of admin net from instance
 
 ---
- .../orchestration/stacks/templates/neutron_basic.yaml | 19 -------------------
- 1 file changed, 19 deletions(-)
+ .../stacks/templates/neutron_basic.yaml            | 19 ---------------
+ .../orchestration/stacks/test_neutron_resources.py | 28 ++++++++++++++++++++++
+ 2 files changed, 28 insertions(+), 19 deletions(-)
 
 diff --git a/tempest/api/orchestration/stacks/templates/neutron_basic.yaml b/tempest/api/orchestration/stacks/templates/neutron_basic.yaml
 index be33c94..2cc4d30 100644
@@ -35,6 +36,45 @@ index be33c94..2cc4d30 100644
 -    properties:
 -      Handle: {get_resource: WaitHandleNeutron}
 -      Timeout: {get_param: timeout}
+diff --git a/tempest/api/orchestration/stacks/test_neutron_resources.py b/tempest/api/orchestration/stacks/test_neutron_resources.py
+index cb6d1db..b972444 100644
+--- a/tempest/api/orchestration/stacks/test_neutron_resources.py
++++ b/tempest/api/orchestration/stacks/test_neutron_resources.py
+@@ -48,6 +48,34 @@ class NeutronResourcesTestJSON(base.BaseOrchestrationTest):
+     @classmethod
+     def resource_setup(cls):
+         super(NeutronResourcesTestJSON, cls).resource_setup()
++
++        # NOTE(dkalashnik): Next fragment was removed from template due to
++        # unavailability of management network from instance:
++        #       user_data_format: RAW
++        #       user_data:
++        #         str_replace:
++        #           template: |
++        #             #!/bin/sh -v
++        #
++        #             SIGNAL_DATA='{"Status": "SUCCESS", \
++        #                           "Reason": "SmokeServerNeutron created", \
++        #                           "Data": "Application has completed \
++        #                                    configuration.", \
++        #                           "UniqueId": "00000"}'
++        #             while ! curl --fail -X PUT -H 'Content-Type:' \
++        #                 --data-binary "$SIGNAL_DATA" \
++        #             'wait_handle' ; do sleep 3; done
++        #           params:
++        #             wait_handle: {get_resource: WaitHandleNeutron}
++        #   WaitHandleNeutron:
++        #     type: AWS::CloudFormation::WaitConditionHandle
++        #   WaitCondition:
++        #     type: AWS::CloudFormation::WaitCondition
++        #     depends_on: Server
++        #     properties:
++        #       Handle: {get_resource: WaitHandleNeutron}
++        #       Timeout: {get_param: timeout}
++
+         cls.neutron_basic_template = cls.load_template('neutron_basic')
+         cls.stack_name = data_utils.rand_name('heat')
+         template = cls.read_template('neutron_basic')
 -- 
 2.3.8 (Apple Git-58)
 
