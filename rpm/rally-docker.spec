@@ -8,6 +8,7 @@ BuildRoot: /root/rpmbuild/BUILDROOT
 Source0:   rallyd.tar.lrz
 Source1:   rallyd-client.tar.lrz
 Source2:   rallyd.sh
+Source3:   generate_nodes_json.py
 URL:       http://mirantis.com
 Requires:  docker-io
 Requires:  lrzip
@@ -20,13 +21,16 @@ mkdir %{name}-%{version}
 cp %{SOURCE0} %{name}-%{version}
 cp %{SOURCE1} %{name}-%{version}
 cp %{SOURCE2} %{name}-%{version}
+cp %{SOURCE3} %{name}-%{version}
 
 %install
 cd %{name}-%{version}
 mkdir -p %{buildroot}/usr/bin
 mkdir -p %{buildroot}/tmp
 chmod +x rallyd.sh
+chmod +x generate_nodes_json.py
 cp rallyd.sh %{buildroot}/usr/bin/
+cp generate_nodes_json.py %{buildroot}/usr/bin
 cp rallyd.tar.lrz %{buildroot}/tmp/
 cp rallyd-client.tar.lrz %{buildroot}/tmp/
 
@@ -43,5 +47,6 @@ rm -r /tmp/rallyd
 
 %files
 /usr/bin/rallyd.sh
+/usr/bin/generate_nodes_json.py
 /tmp/rallyd.tar.lrz
 /tmp/rallyd-client.tar.lrz
