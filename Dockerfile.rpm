@@ -11,10 +11,10 @@ RUN /bin/bash -c "mkdir -p /root/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}"     
     echo "Preparing SOURCE data for RPM"                                           && \
     lrzip -D -o /root/rpmbuild/SOURCES/rallyd.tar.lrz /tmp/build/rallyd.tar        && \
     lrztar rallyd/rallyd-client && mv rallyd-client.tar.lrz /root/rpmbuild/SOURCES && \
-    cp /tmp/build/rpm/bin/rallyd.sh /root/rpmbuild/SOURCES                         && \
+    cp /tmp/build/rpm/bin/* /root/rpmbuild/SOURCES                                 && \
 
     echo "Building RPM"                                                            && \
-    cp /tmp/build/rpm/rally-docker.spec /root/rpmbuild/SPECS/rally-docker.spec         &&\
+    cp /tmp/build/rpm/rally-docker.spec /root/rpmbuild/SPECS/rally-docker.spec     && \
     cd /root/rpmbuild/ && rpmbuild -ba SPECS/rally-docker.spec
 WORKDIR /root
 USER root
