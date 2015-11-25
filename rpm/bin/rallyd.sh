@@ -3,6 +3,8 @@
 name="rallyd-isolated"
 pid_file="/var/run/$name.pid"
 
+OS_TEST_TIMEOUT=${OS_TEST_TIMEOUT:-1200}
+
 get_backends() {
     backends=""
     for addr in $(fuel nodes | grep "controller" | grep -Eo "([0-9]{1,3}[\.]){3}[0-9]{1,3}" 2>/dev/null)
@@ -38,7 +40,7 @@ case "$1" in
     else
         echo "Starting $name"
         enable_admin_api
-        pid=$(docker run -d -e BACKEND_IPS="$(get_backends)" -p 0.0.0.0:10000:8000 rallyd-isolated)
+        pid=$(docker run -d -e OS_TEST_TIMEOUT=${OS_TEST_TIMEOUT} -e BACKEND_IPS="$(get_backends)" -p 0.0.0.0:10000:8000 rallyd-isolated)
         echo ${pid:0:12} > "$pid_file"
         docker exec `get_pid` /bin/bash -c "mkdir /root/.ssh"
         docker exec -i `get_pid` /bin/bash -c "cat > /root/.ssh/id_rsa" < /root/.ssh/id_rsa

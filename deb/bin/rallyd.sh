@@ -3,6 +3,8 @@
 name="rallyd-isolated"
 pid_file="/var/run/$name.pid"
 
+OS_TEST_TIMEOUT=${OS_TEST_TIMEOUT:-1200}
+
 get_pid() {
     cat "$pid_file"
 }
@@ -17,7 +19,7 @@ case "$1" in
         echo "Already started"
     else
         echo "Starting $name"
-        pid=$(docker run -d -p 0.0.0.0:10000:8000 rallyd-isolated rallyd)
+        pid=$(docker run -d -e OS_TEST_TIMEOUT=${OS_TEST_TIMEOUT} -p 0.0.0.0:10000:8000 rallyd-isolated rallyd)
         echo ${pid:0:12} > "$pid_file"
     fi
     ;;
