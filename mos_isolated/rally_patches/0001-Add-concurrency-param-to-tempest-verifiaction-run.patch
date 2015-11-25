@@ -1,0 +1,44 @@
+From 271f7156ed8b3b5b25868b3e20acfe1195e54bf8 Mon Sep 17 00:00:00 2001
+From: Dmitry Kalashnik <dkalashnik@mirantis.com>
+Date: Thu, 19 Nov 2015 16:50:40 +0300
+Subject: [PATCH] Add concurrency param to tempest verifiaction run
+
+Change-Id: If6384099d499654526cd8bd36a76597b06faac08
+---
+ rally/verification/tempest/tempest.py | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/rally/verification/tempest/tempest.py b/rally/verification/tempest/tempest.py
+index 9c4b900..7a44edf 100644
+--- a/rally/verification/tempest/tempest.py
++++ b/rally/verification/tempest/tempest.py
+@@ -295,7 +295,7 @@ class Tempest(object):
+             shutil.rmtree(self.path())
+ 
+     @utils.log_verification_wrapper(LOG.info, _("Run verification."))
+-    def _prepare_and_run(self, set_name, regex):
++    def _prepare_and_run(self, set_name, regex, concurrency=1):
+         if not self.is_configured():
+             self.generate_config_file()
+ 
+@@ -307,6 +307,8 @@ class Tempest(object):
+             else:
+                 testr_arg = set_name or regex
+ 
++        testr_arg = "--concurrency={0} {1}".format(concurrency, testr_arg)
++
+         self.verification.start_verifying(set_name)
+         try:
+             self.run(testr_arg)
+@@ -389,6 +391,6 @@ class Tempest(object):
+         else:
+             self.verification.set_failed()
+ 
+-    def verify(self, set_name, regex):
+-        self._prepare_and_run(set_name, regex)
++    def verify(self, set_name, regex, concurrency):
++        self._prepare_and_run(set_name, regex, concurrency)
+         self._save_results()
+-- 
+2.3.8 (Apple Git-58)
+
